@@ -16,6 +16,7 @@ For help getting started with Flutter development, view the
 samples, guidance on mobile development, and a full API reference.
 
 ==============================================================
+
 Project Structure
 First, you'll need to add the provider package to your pubspec.yaml file:
 
@@ -25,6 +26,7 @@ dependencies:
   flutter:
     sdk: flutter
   provider: ^6.0.0 # Use the latest version
+  intl: ^0.18.1 # Add this line
 The file structure should be organized for clarity:
 
 lib/

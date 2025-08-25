@@ -33,6 +33,7 @@ dependencies:
   provider: ^6.1.5 
   intl: ^0.18.1 # Add this line
   shared_preferences: ^2.2.0  # Add this line
+  google_fonts: ^5.1.0 # Add this line
   # You might also want to add this for search functionality
   collection: ^1.17.2
 

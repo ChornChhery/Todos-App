@@ -14,3 +14,27 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+
+==============================================================
+Project Structure
+First, you'll need to add the provider package to your pubspec.yaml file:
+
+YAML
+
+dependencies:
+  flutter:
+    sdk: flutter
+  provider: ^6.0.0 # Use the latest version
+The file structure should be organized for clarity:
+
+lib/
+├── main.dart
+├── models/
+│   └── submission.dart
+├── providers/
+│   └── submission_provider.dart
+├── screens/
+│   ├── input_page.dart
+│   └── list_page.dart
+└── widgets/
+    └── notification_badge.dart

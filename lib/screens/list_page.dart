@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../providers/submission_provider.dart';
-import '../models/submission.dart';
 
 class ListPage extends StatefulWidget {
   const ListPage({super.key});
@@ -32,7 +31,7 @@ class _ListPageState extends State<ListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Submitted Items'),
+        title: const Text('All Tasks'),
         actions: [
           PopupMenuButton<SortOrder>(
             icon: const Icon(Icons.sort),
@@ -55,15 +54,18 @@ class _ListPageState extends State<ListPage> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(16.0),
             child: TextField(
               controller: _searchController,
-              decoration: const InputDecoration(
-                labelText: 'Search items...',
-                prefixIcon: Icon(Icons.search),
+              decoration: InputDecoration(
+                hintText: 'Search tasks...',
+                prefixIcon: const Icon(Icons.search, color: Colors.grey),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                  borderRadius: BorderRadius.circular(30.0),
+                  borderSide: BorderSide.none,
                 ),
+                filled: true,
+                fillColor: Colors.grey[200],
               ),
               onChanged: (query) {
                 Provider.of<SubmissionProvider>(context, listen: false).setSearchQuery(query);
@@ -75,17 +77,17 @@ class _ListPageState extends State<ListPage> {
               builder: (context, provider, child) {
                 final submissions = provider.submissions;
                 if (submissions.isEmpty && provider.searchQuery.isEmpty) {
-                  return const Center(child: Text('No submissions yet.'));
+                  return const Center(child: Text('No tasks added yet.'));
                 } else if (submissions.isEmpty && provider.searchQuery.isNotEmpty) {
                   return const Center(child: Text('No matching results.'));
                 }
-
+                
                 return ListView.builder(
                   itemCount: submissions.length,
                   itemBuilder: (context, index) {
                     final submission = submissions[index];
                     return Dismissible(
-                      key: ValueKey(submission),
+                      key: ValueKey(submission.timestamp), // Use timestamp as unique key
                       background: Container(
                         color: Colors.red,
                         alignment: Alignment.centerRight,
@@ -96,19 +98,31 @@ class _ListPageState extends State<ListPage> {
                       onDismissed: (direction) {
                         provider.removeSubmission(index);
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Item deleted: ${submission.text}')),
+                          SnackBar(content: Text('Task "${submission.text}" deleted')),
                         );
                       },
                       child: Card(
-                        margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         child: ListTile(
-                          title: Text(submission.text),
-                          subtitle: Text(DateFormat('yyyy-MM-dd – kk:mm').format(submission.timestamp)),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          leading: const Icon(Icons.task, color: Color(0xFF42A5F5)),
+                          title: Text(
+                            submission.text,
+                            style: const TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                          subtitle: Text(
+                            DateFormat('dd MMM yyyy, hh:mm a').format(submission.timestamp),
+                            style: TextStyle(color: Colors.grey[600]),
+                          ),
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               IconButton(
-                                icon: const Icon(Icons.edit),
+                                icon: const Icon(Icons.edit, color: Colors.grey),
                                 onPressed: () => _showEditDialog(context, provider, index),
                               ),
                               IconButton(
@@ -116,7 +130,7 @@ class _ListPageState extends State<ListPage> {
                                 onPressed: () {
                                   provider.removeSubmission(index);
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('Item deleted: ${submission.text}')),
+                                    SnackBar(content: Text('Task "${submission.text}" deleted')),
                                   );
                                 },
                               ),
@@ -141,17 +155,22 @@ class _ListPageState extends State<ListPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Edit Submission'),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          title: const Text('Edit Task'),
           content: TextField(
             controller: editController,
             autofocus: true,
+            decoration: const InputDecoration(
+              hintText: 'Update task here...',
+              border: OutlineInputBorder(),
+            ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
               child: const Text('Cancel'),
             ),
-            TextButton(
+            ElevatedButton(
               onPressed: () {
                 if (editController.text.isNotEmpty) {
                   provider.updateSubmission(index, editController.text);

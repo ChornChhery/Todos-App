@@ -26,7 +26,7 @@ class _InputPageState extends State<InputPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Input Page'),
+        title: const Text('Task Manager'),
         actions: [
           Stack(
             children: [
@@ -43,20 +43,21 @@ class _InputPageState extends State<InputPage> {
                   right: 11,
                   top: 11,
                   child: Container(
-                    padding: const EdgeInsets.all(2),
+                    padding: const EdgeInsets.all(3),
                     decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(6),
+                      color: Theme.of(context).colorScheme.secondary,
+                      shape: BoxShape.circle,
                     ),
                     constraints: const BoxConstraints(
-                      minWidth: 14,
-                      minHeight: 14,
+                      minWidth: 16,
+                      minHeight: 16,
                     ),
                     child: Text(
                       '${provider.submissionCount}',
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 8,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -66,28 +67,65 @@ class _InputPageState extends State<InputPage> {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _controller,
-              decoration: const InputDecoration(
-                labelText: 'Enter text',
-                border: OutlineInputBorder(),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    children: [
+                      const Text(
+                        'Add a New Task',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF42A5F5),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: _controller,
+                        decoration: InputDecoration(
+                          labelText: 'Enter task',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide.none,
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey[200],
+                          suffixIcon: IconButton(
+                            icon: const Icon(Icons.clear, color: Colors.grey),
+                            onPressed: () => _controller.clear(),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () {
+                          if (_controller.text.isNotEmpty) {
+                            provider.addSubmission(_controller.text);
+                            _controller.clear();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Task added successfully!')),
+                            );
+                          }
+                        },
+                        child: const Text('Submit Task'),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                if (_controller.text.isNotEmpty) {
-                  provider.addSubmission(_controller.text);
-                  _controller.clear();
-                }
-              },
-              child: const Text('Submit'),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

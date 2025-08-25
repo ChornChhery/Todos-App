@@ -34,7 +34,7 @@ dependencies:
   intl: ^0.18.1 # Add this line
   shared_preferences: ^2.2.0  # Add this line
   google_fonts: ^5.1.0 # Add this line
-  flutter_local_notifications: ^16.0.0 # For reminders
+  flutter_local_notifications: ^16.3.3 # For reminders
   timezone: ^0.9.2 # To handle timezones for scheduling
 
   # You might also want to add this for search functionality

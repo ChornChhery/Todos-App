@@ -2,6 +2,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart' as fln;
+import 'package:timezone/timezone.dart' as tz;
 import '../models/submission.dart';
 
 enum SortOrder { newest, oldest }
@@ -10,27 +12,76 @@ class SubmissionProvider with ChangeNotifier {
   final List<Submission> _submissions = [];
   SortOrder _sortOrder = SortOrder.newest;
   String _searchQuery = '';
+  final fln.FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = fln.FlutterLocalNotificationsPlugin();
 
   SubmissionProvider() {
+    _initNotifications();
     _loadSubmissions();
   }
 
+  // --- Notification Logic ---
+  Future<void> _initNotifications() async {
+    const fln.AndroidInitializationSettings initializationSettingsAndroid =
+        fln.AndroidInitializationSettings('@mipmap/ic_launcher');
+    final fln.InitializationSettings initializationSettings =
+        fln.InitializationSettings(android: initializationSettingsAndroid);
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  }
+
+  Future<void> _scheduleNotification(Submission submission) async {
+    if (submission.dueDate == null) return;
+
+    final tz.TZDateTime scheduledDate = tz.TZDateTime.from(
+      submission.dueDate!,
+      tz.local,
+    );
+
+    const fln.AndroidNotificationDetails androidPlatformChannelSpecifics =
+        fln.AndroidNotificationDetails(
+      'due_date_channel',
+      'Due Date Reminders',
+      channelDescription: 'Reminders for your university tasks.',
+      importance: fln.Importance.max,
+      priority: fln.Priority.high,
+    );
+
+    const fln.NotificationDetails platformChannelSpecifics =
+        fln.NotificationDetails(android: androidPlatformChannelSpecifics);
+
+    await flutterLocalNotificationsPlugin.zonedSchedule(
+      submission.id,
+      'Task Due Soon!',
+      submission.text,
+      scheduledDate,
+      platformChannelSpecifics,
+      androidAllowWhileIdle: true,
+      uiLocalNotificationDateInterpretation:
+          fln.UILocalNotificationDateInterpretation.absoluteTime,
+    );
+  }
+
+  // --- Task Management Logic ---
   String get searchQuery => _searchQuery;
 
   List<Submission> get submissions {
-    // Apply search filter
     final filteredList = _submissions.where((sub) {
       return sub.text.toLowerCase().contains(_searchQuery.toLowerCase());
     }).toList();
 
-    // Apply sorting
+    filteredList.sort((a, b) {
+      if (a.isCompleted != b.isCompleted) {
+        return a.isCompleted ? 1 : -1;
+      }
+      return (a.dueDate ?? a.timestamp).compareTo(b.dueDate ?? b.timestamp);
+    });
+
     if (_sortOrder == SortOrder.oldest) {
       return filteredList;
     }
     return filteredList.reversed.toList();
   }
 
-  int get submissionCount => _submissions.length;
+  int get submissionCount => _submissions.where((sub) => !sub.isCompleted).length;
 
   Future<void> _loadSubmissions() async {
     final prefs = await SharedPreferences.getInstance();
@@ -48,26 +99,54 @@ class SubmissionProvider with ChangeNotifier {
     await prefs.setStringList('submissions', submissionsJson);
   }
 
-  void addSubmission(String text) {
-    _submissions.add(Submission(text: text, timestamp: DateTime.now()));
+  void addSubmission(Submission submission) {
+    _submissions.add(submission);
     _saveSubmissions();
+    _scheduleNotification(submission);
     notifyListeners();
   }
 
-  void updateSubmission(int index, String newText) {
-    final originalIndex = _submissions.indexOf(submissions[index]);
-    _submissions[originalIndex] = Submission(
-      text: newText,
-      timestamp: _submissions[originalIndex].timestamp,
-    );
-    _saveSubmissions();
-    notifyListeners();
+  void updateSubmission(int id, String newText, DateTime? newDueDate, Priority newPriority) {
+    final originalIndex = _submissions.indexWhere((sub) => sub.id == id);
+    if (originalIndex != -1) {
+      final oldSubmission = _submissions[originalIndex];
+      _submissions[originalIndex] = Submission(
+        id: oldSubmission.id,
+        text: newText,
+        timestamp: oldSubmission.timestamp,
+        dueDate: newDueDate,
+        priority: newPriority,
+        isCompleted: oldSubmission.isCompleted,
+      );
+      _saveSubmissions();
+      flutterLocalNotificationsPlugin.cancel(id);
+      _scheduleNotification(_submissions[originalIndex]);
+      notifyListeners();
+    }
   }
 
-  void removeSubmission(int index) {
-    final originalIndex = _submissions.indexOf(submissions[index]);
-    _submissions.removeAt(originalIndex);
+  void toggleCompletion(int id, bool value) {
+    final originalIndex = _submissions.indexWhere((sub) => sub.id == id);
+    if (originalIndex != -1) {
+      final oldSubmission = _submissions[originalIndex];
+      _submissions[originalIndex] = Submission(
+        id: oldSubmission.id,
+        text: oldSubmission.text,
+        timestamp: oldSubmission.timestamp,
+        dueDate: oldSubmission.dueDate,
+        priority: oldSubmission.priority,
+        isCompleted: value,
+      );
+      _saveSubmissions();
+      flutterLocalNotificationsPlugin.cancel(id);
+      notifyListeners();
+    }
+  }
+
+  void removeSubmission(int id) {
+    _submissions.removeWhere((sub) => sub.id == id);
     _saveSubmissions();
+    flutterLocalNotificationsPlugin.cancel(id);
     notifyListeners();
   }
 

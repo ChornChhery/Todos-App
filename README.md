@@ -1,42 +1,74 @@
-# save_homework
+# 📚 Save Homework
 
-A new Flutter project.
+**Save Homework** is a Flutter application designed to help students keep track of their homework submissions, deadlines, and reminders — all in a simple, clean UI.
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## 🛠️ Features
 
-A few resources to get you started if this is your first Flutter project:
+- 📥 **Add Homework Submissions**  
+- 📋 **View Homework List**  
+- ⏰ **Set Notifications and Reminders**  
+- 🧠 **Persistent Data with Shared Preferences**  
+- 🌍 **Timezone-aware Scheduling**  
+- 🎨 **Custom Fonts with Google Fonts**
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+---
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 📁 Project Structure
 
-==============================================================
+```plaintext
+lib/
+├── main.dart
+├── models/
+│   └── submission.dart                 # Data model for homework submissions
+├── providers/
+│   └── submission_provider.dart        # State management with Provider
+├── screens/
+│   ├── input_page.dart                 # UI for adding homework
+│   └── list_page.dart                  # UI to display homework list
+└── widgets/
+    └── notification_badge.dart         # UI component for showing notification badges
+```
 
-Project Structure
-First, you'll need to add the provider package to your pubspec.yaml file:
+---
 
-YAML
+🧾 Dependencies
 
 dependencies:
   flutter:
     sdk: flutter
-  provider: ^6.0.0 # Use the latest version
-  intl: ^0.18.1 # Add this line
-The file structure should be organized for clarity:
+  provider: ^6.1.5 
+  intl: ^0.18.1
+  shared_preferences: ^2.2.0
+  google_fonts: ^5.1.0
+  flutter_local_notifications: ^16.3.3
+  timezone: ^0.9.2
 
-lib/
-├── main.dart
-├── models/
-│   └── submission.dart
-├── providers/
-│   └── submission_provider.dart
-├── screens/
-│   ├── input_page.dart
-│   └── list_page.dart
-└── widgets/
-    └── notification_badge.dart
+---
+
+
+## Screenshots
+
+| Input Page              | List Page               | Notification Badge    |
+| ----------------------- | ----------------------- | --------------------- |
+| ![Input](image.png)     | ![List](image-1.png)    | ![Badge](image-2.png) |
+| ![Image 3](image-3.png) | ![Image 4](image-4.png) |                       |
+
+
+
+## 👨‍💻 Author
+Created by [Chhery Chorn]
+
+
+---
+
+### 📝 Notes:
+
+- Make sure your images (`image.png`, `image-1.png`, etc.) are placed in the **same folder as your `README.md`** or update the paths accordingly (e.g., `assets/images/image.png`).
+- Replace `yourusername` in the GitHub clone URL with your actual GitHub username.
+- Replace **[Your Name]** with your actual name.
+
+Once saved and pushed to your GitHub repo, GitHub will automatically render the markdown to look just like what I showed earlier.
+
+Let me know if you’d like it styled even more!

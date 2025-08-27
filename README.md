@@ -59,16 +59,16 @@ dependencies:
 
 
 ## 👨‍💻 Author
-Created by [Chhery Chorn]
+Created by Chhery Chorn
 
 
 ---
 
 ### 📝 Notes:
 
-- Make sure your images (`image.png`, `image-1.png`, etc.) are placed in the **same folder as your `README.md`** or update the paths accordingly (e.g., `assets/images/image.png`).
-- Replace `yourusername` in the GitHub clone URL with your actual GitHub username.
-- Replace **[Your Name]** with your actual name.
+- Make sure your images (`image.png`, `image-1.png`, etc.) are placed in the **same folder as your `README.md`** or update the paths accordingly (e.g., `image.png`).
+- `ChornChhery` in the GitHub clone URL with your actual GitHub username.
+- **Chhery Chorn** with your actual name.
 
 Once saved and pushed to your GitHub repo, GitHub will automatically render the markdown to look just like what I showed earlier.
 

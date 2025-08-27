@@ -33,7 +33,8 @@ lib/
 
 ---
 
-🧾 Dependencies
+## 🧾 Dependencies
+```plaintext
 
 dependencies:
   flutter:
@@ -44,7 +45,7 @@ dependencies:
   google_fonts: ^5.1.0
   flutter_local_notifications: ^16.3.3
   timezone: ^0.9.2
-
+```
 ---
 
 
